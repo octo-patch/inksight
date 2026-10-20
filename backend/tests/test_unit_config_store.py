@@ -205,4 +205,4 @@ class TestConfigStore:
         assert config["mode_overrides"]["STOIC"]["city"] == "杭州"
 
     def test_get_default_llm_model_for_provider_minimax(self):
-        assert get_default_llm_model_for_provider("minimax") == "MiniMax-M3"
+        assert get_default_llm_model_for_provider("minimax") == "MiniMax-M3.1-Flash"

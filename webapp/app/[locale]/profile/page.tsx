@@ -261,7 +261,7 @@ export default function ProfilePage() {
       return ["qwen3.5-flash", "deepseek-v3.2", "Moonshot-Kimi-K2-Instruct"];
     }
     if (provider === "minimax") {
-      return ["MiniMax-M3", "MiniMax-M2.7"];
+      return ["MiniMax-M3.1-Flash", "MiniMax-M3"];
     }
     // 默认 DeepSeek
     return ["deepseek-chat", "deepseek-reasoner"];
@@ -271,6 +271,8 @@ export default function ProfilePage() {
   useEffect(() => {
     if (llmAccessMode !== "preset") return;
     const opts = getLlmModelOptions(llmProvider);
+    // Keep saved MiniMax model IDs even when they leave the preset catalog.
+    if (llmProvider === "minimax" && llmModel) return;
     if (!opts.includes(llmModel)) {
       setLlmModel(opts[0]);
     }
@@ -628,7 +630,10 @@ export default function ProfilePage() {
                     <Field label={tr("API 服务商", "API Provider")}>
                       <select
                         value={llmProvider}
-                        onChange={(e) => setLlmProvider(e.target.value)}
+                        onChange={(e) => {
+                          setLlmProvider(e.target.value);
+                          setLlmModel(getLlmModelOptions(e.target.value)[0]);
+                        }}
                         className="w-full rounded-sm border border-ink/20 px-3 py-2 text-sm bg-white"
                       >
                         <option value="aliyun">{tr("阿里百炼", "Alibaba Bailian")}</option>
@@ -642,6 +647,9 @@ export default function ProfilePage() {
                         onChange={(e) => setLlmModel(e.target.value)}
                         className="w-full rounded-sm border border-ink/20 px-3 py-2 text-sm bg-white"
                       >
+                        {llmProvider === "minimax" && llmModel && !getLlmModelOptions(llmProvider).includes(llmModel) && (
+                          <option value={llmModel}>{llmModel}</option>
+                        )}
                         {getLlmModelOptions(llmProvider).map((model) => (
                           <option key={model} value={model}>
                             {model}
@@ -739,8 +747,8 @@ export default function ProfilePage() {
                       <option value="https://api.minimaxi.com/v1" />
                     </datalist>
                     <datalist id="llm-model-presets">
+                      <option value="MiniMax-M3.1-Flash" />
                       <option value="MiniMax-M3" />
-                      <option value="MiniMax-M2.7" />
                     </datalist>
 
                     {/* ── 图像生成 ── */}
